@@ -1,0 +1,93 @@
+{
+  "_note": "MOCKED DATA. Hand-written stand-ins for a real language model and a real paper/source search. Answers are already split into sentences, and each resample is aligned sentence by sentence. Nothing here calls a live service.",
+  "model_answers": {
+    "gutenberg": {
+      "triggers": [
+        "gutenberg"
+      ],
+      "answer": [
+        "The Gutenberg Bible was printed in Mainz, Germany, around 1455.",
+        "Gutenberg printed about 500 copies.",
+        "It was one of the first books in Europe printed with metal movable type."
+      ],
+      "resamples": [
+        [
+          "The Gutenberg Bible was printed in Mainz around 1455.",
+          "Gutenberg printed about 180 copies.",
+          "It was one of the first European books printed with metal movable type."
+        ],
+        [
+          "The Gutenberg Bible was printed in Mainz, Germany, around 1455.",
+          "About 180 copies were printed.",
+          "It was among the first books in Europe printed with metal movable type."
+        ]
+      ]
+    },
+    "ai_schools_source": {
+      "triggers": [
+        "ai",
+        "school"
+      ],
+      "answer": [
+        "Here is a useful paper: Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60.",
+        "It shows that AI tutors improved test scores by 20%."
+      ],
+      "resamples": [
+        [
+          "A good source is Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60.",
+          "It reports that AI tutors raised test scores by 20%."
+        ],
+        [
+          "You could use Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60.",
+          "The study found test scores went up by 35%."
+        ]
+      ]
+    }
+  },
+  "source_index": [
+    {
+      "id": "S1",
+      "type": "web",
+      "title": "Gutenberg Bible (library museum page)",
+      "keywords": [
+        "mainz",
+        "1455"
+      ]
+    },
+    {
+      "id": "S2",
+      "type": "web",
+      "title": "Encyclopedia entry: Gutenberg Bible",
+      "keywords": [
+        "180 copies",
+        "1455"
+      ]
+    },
+    {
+      "id": "S3",
+      "type": "web",
+      "title": "History of printing in Europe (encyclopedia)",
+      "keywords": [
+        "movable type"
+      ]
+    },
+    {
+      "id": "R1",
+      "type": "paper",
+      "title": "AI tutoring systems and student learning: a review (placeholder record, 2020)",
+      "keywords": [
+        "ai tutor",
+        "tutoring"
+      ]
+    },
+    {
+      "id": "R2",
+      "type": "paper",
+      "title": "Generative AI in secondary classrooms (placeholder record, 2024)",
+      "keywords": [
+        "secondary school",
+        "classroom"
+      ]
+    }
+  ]
+}

@@ -4,7 +4,7 @@ Use this file for the use case from your Week 2 storyboard. Keep the notes short
 
 Use case from my Week 2 storyboard (`storyboard/week2_normal_storyboard.png`, `storyboard/week2_failure_recovery.png`): a student asks a study chatbot a question, and the system marks the sentences in the answer that may be unreliable ("Check this").
 
-Route: small prototype (Python simulation). Run it with `python check_this_sim.py --all`. The language model and the source search are **mocked** with `mock_data.json`. The checks, the flag rule and the response are **implemented** in `check_this_sim.py`. A real LLM API and a real search API are **planned**, not built.
+Route: small prototype (Python simulation). Run it with `python check_this_sim.py --all`. To see what the student would see, open `compare_view.html` in a browser: it shows v1 and v2 side by side as chat screens for each test. The language model and the source search are **mocked** with `mock_data.json`. The checks, the flag rule and the response are **implemented** in `check_this_sim.py`. A real LLM API and a real search API are **planned**, not built.
 
 ## User goal
 A student wants to use correct facts and real sources in their coursework, and wants to know which parts of a chatbot answer they need to check.

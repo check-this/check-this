@@ -35,3 +35,9 @@ What came back:
 - Copies of my Week 2 storyboard images in `storyboard/`.
 
 What I decided to keep, change or reject, and why: **(to complete)**
+
+## 2026-10-20 17:51  Make the test results easier to see
+Tool used: Claude (Anthropic) in the Claude app, as above.
+Request or command: I ran `python3 check_this_sim.py --version v1 --test B` and `--version v2 --test B` in my own terminal. The output was correct, but I said the test output was hard to read.
+What came back: Claude added a `--html` option to `check_this_sim.py`. It writes `compare_view.html`, which shows v1 and v2 side by side as chat screens for Test A, Test B and Test B with the search down, with a one-line verdict under each. The Markdown test outputs in `test_runs/` stayed the same.
+What I decided to keep, change or reject, and why: **(to complete)**

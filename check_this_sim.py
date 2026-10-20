@@ -103,7 +103,11 @@ def run(version, test, source_down=False):
     steps = []
     key, item = pick_mock_answer(question)
     if item is None:
-        p("1. [MOCKED] No canned model answer for this question. The simulation stops here.\n")
+        p("1. [MOCKED] No canned model answer for this question.\n")
+        p("## Response shown to the student\n")
+        p("> Sorry, this prototype cannot answer that question. It only has answers for the two test questions.\n")
+        p("## Next action for the student\n")
+        p("- Ask one of the test questions, or use another tool.\n")
         return "\n".join(out)
 
     clarify = None

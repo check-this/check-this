@@ -47,3 +47,9 @@ Tool used: Claude (Anthropic) in the Claude app, as above.
 Request or command: I asked Claude to redo only the test part, because the test output was still hard to read. I kept the use case and the diagrams.
 What came back: The same two test inputs, but each test record in `test_runs/` now follows the four fields (input, what it receives, what it does, response and next action) in plain steps, with a one-line result. Claude also added screenshots of each test screen in `test_screens/` (v1 left, v2 right) and rewrote the Test A and Test B parts of `01_SPEC.md` to use them. The checks and the results did not change.
 What I decided to keep, change or reject, and why: **(to complete)**
+
+## 2026-10-23 00:22  Cut the work back to what the lab asks for
+Tool used: Claude (Anthropic) in the Claude app, as above.
+Request or command: I asked what the lab actually requires and asked Claude not to do more than that.
+What came back: Claude removed the extra parts: the HTML comparison page, the screenshots, the "search down" test, the v2 rerun of Test A, the second storyboard image, the clarifying question and the search-down fallback. Now there is one interaction change (NOT VERIFIED label with a reason and buttons) and one system change (paper validation step), Test A and Test B on v1, and Test B again on v2. `check_this_sim.py` is shorter (about 150 lines), and `01_SPEC.md` and both diagrams were updated to match.
+What I decided to keep, change or reject, and why: **(to complete)**

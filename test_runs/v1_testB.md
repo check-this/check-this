@@ -1,35 +1,29 @@
-# V1 - Test B
+# Test B on v1: problem input (vague request for a source)
 
-## Input
+Screen: `test_screens/testB.png` (v1 left, v2 right)
 
-> can u give me a source about AI in school for my essay
+## 1. Input
+The student types: **"can u give me a source about AI in school for my essay"**
 
-## What the system receives
+## 2. What the system receives
+- The question above.
+- An answer with 2 sentences, plus the same question answered 2 more times. [MOCKED: mock_data.json]
+- Source search results for each sentence. [MOCKED]
 
-- The student's question (text).
-- [MOCKED] One model answer and two resampled answers to the same question.
-- [MOCKED] Results from the source search for each sentence.
+## 3. What it does
+1. Checks each sentence:
+   - Sentence 1: "Here is a useful paper: Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60." → same in all 3 answers; related sources found: R1, R2 → no highlight
+   - Sentence 2: "It shows that AI tutors improved test scores by 20%." → **changed** when asked again; related sources found: R1 → **YELLOW**
+2. Rule v1: highlight only the sentences that changed. (The sources do not change the decision.)
 
-## What it does
+## 4. Response and next action
+What the student sees (⚠ = yellow highlight):
 
-1. [MOCKED] Model writes an answer with 2 sentences and is asked the same question 2 more times.
-2. [IMPLEMENTED] Consistency check: compare the numbers in each sentence with the same sentence in the 2 resamples.
-3. [MOCKED] Source search: look for sources that match each sentence.
-4. [IMPLEMENTED] Flag rule v1: highlight a sentence only if it was NOT consistent. Sources are shown but do not change the flag.
+> Here is a useful paper: Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60.  
+> ⚠ It shows that AI tutors improved test scores by 20%. **[Check this]**  
 
-### Sentence check table
+Next action:
+- The student can click "Check this" on sentence 2.
+- Sentence 1 (the paper) has no highlight, so it looks safe. The student would probably copy it.
 
-| # | Sentence | Type | Same in resamples? | Sources found | Verified | Flag |
-|---|---|---|---|---|---|---|
-| 1 | Here is a useful paper: Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60. | (not used in v1) | yes | R1, R2 | (not checked in v1) | - |
-| 2 | It shows that AI tutors improved test scores by 20%. | (not used in v1) | no | R1 | (not checked in v1) | YELLOW |
-
-## Response shown to the student
-
-> Here is a useful paper: Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60.
-> ==It shows that AI tutors improved test scores by 20%.== `[Check this]`
-
-## Next action for the student
-
-- The student sees 1 yellow sentence(s): [2]. They can click "Check this" on those.
-- Sentence(s) [1] look trusted (no highlight), so the student would probably copy them into the essay.
+**Result:** PROBLEM: the made-up paper is not highlighted.

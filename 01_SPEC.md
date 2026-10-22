@@ -4,7 +4,7 @@ Use this file for the use case from your Week 2 storyboard. Keep the notes short
 
 Use case from my Week 2 storyboard (`storyboard/week2_normal_storyboard.png`, `storyboard/week2_failure_recovery.png`): a student asks a study chatbot a question, and the system marks the sentences in the answer that may be unreliable ("Check this").
 
-Route: small prototype (Python simulation). Run it with `python check_this_sim.py --all`. To see what the student would see, open `compare_view.html` in a browser: it shows v1 and v2 side by side as chat screens for each test. The language model and the source search are **mocked** with `mock_data.json`. The checks, the flag rule and the response are **implemented** in `check_this_sim.py`. A real LLM API and a real search API are **planned**, not built.
+Route: small prototype (Python simulation). Run it with `python check_this_sim.py --all`. To see what the student would see, open `compare_view.html` in a browser: it shows v1 and v2 side by side as chat screens for each test. Each test also has a short record in `test_runs/` and a screenshot in `test_screens/`. The language model and the source search are **mocked** with `mock_data.json`. The checks, the flag rule and the response are **implemented** in `check_this_sim.py`. A real LLM API and a real search API are **planned**, not built.
 
 ## User goal
 A student wants to use correct facts and real sources in their coursework, and wants to know which parts of a chatbot answer they need to check.
@@ -39,34 +39,51 @@ Each box is labelled IMPLEMENTED, SIMULATED (mock) or planned.
 ![System path v1](diagrams/system_path_v1.png)
 
 ## Test A: standard input
-Full output: `test_runs/v1_testA.md`
+How I ran it: `python check_this_sim.py --version v1 --test A`. Record: `test_runs/v1_testA.md`. Screen: `test_screens/testA.png` (left side = v1).
 
 Input:
-"When was the Gutenberg Bible printed, and how many copies were made?"
+"When was the Gutenberg Bible printed, and how many copies were made?" (a clear fact question)
 
 What the system receives:
-The question, a 3-sentence model answer, 2 resampled answers [mocked], and the source search results [mocked].
+- the question
+- an answer with 3 sentences, and the same question answered 2 more times [mocked]
+- source search results for each sentence [mocked]
 
 What it does:
-The consistency check finds that sentence 2 says "500 copies", but the resamples say "180". Sentences 1 and 3 are the same in every answer. The source search finds sources for sentences 1 and 3, but none for sentence 2. Flag rule v1 highlights sentence 2 only.
+1. Sentence 1 (Mainz, 1455): the same in all 3 answers, sources found → no highlight
+2. Sentence 2 ("about 500 copies"): the other answers say **180** → **yellow**
+3. Sentence 3 (movable type): the same in all 3 answers → no highlight
 
 Response and next action:
-The answer is shown with "Gutenberg printed about 500 copies." in yellow with a "Check this" button. The student can open the sources, find that the number is about 180, and fix the sentence.
+The student sees the answer with only "Gutenberg printed about 500 copies." in yellow and a "Check this" button. They click it, read the sources, see "about 180", and fix the sentence.
+
+**Result: works as planned.** The wrong number is caught.
+
+![Test A](test_screens/testA.png)
 
 ## Test B: problem input
-Full output: `test_runs/v1_testB.md` and `test_runs/v1_testB_source_down.md`
+How I ran it: `python check_this_sim.py --version v1 --test B` (and again with `--source-down`). Records: `test_runs/v1_testB.md`, `test_runs/v1_testB_source_down.md`. Screens: `test_screens/testB.png`, `test_screens/testB_search_down.png` (left side = v1).
 
 Input:
 "can u give me a source about AI in school for my essay" (vague: no clear topic, and it asks for a source)
 
 What the system receives:
-The question, a 2-sentence answer with a reference (Smith, J., 2021, a placeholder paper that does not exist) and 2 resamples [mocked], and source search results [mocked].
+- the question
+- an answer with 2 sentences: a paper "Smith, J. (2021). AI Tutors in Secondary Schools…" (a placeholder paper that does **not** exist) and "AI tutors improved test scores by 20%", plus 2 more answers [mocked]
+- source search results [mocked]
 
 What it does:
-The model gives the same reference in every resample, so the consistency check says it is consistent. The source search finds pages about "AI tutors" (a topic match), but no record of this paper. Flag rule v1 only looks at consistency, so the reference is **not** highlighted. Only "20%" is highlighted, because one resample says 35%. There is no check for the vague request. In the extra run with the search down, the search fails, but the response looks the same.
+1. Sentence 1 (the paper): the model gives **the same paper every time**, so it looks consistent → **no highlight**
+2. Sentence 2 ("20%"): one answer says 35% → **yellow**
+3. It does not check if the request is too vague.
+4. With the search down: the search fails, but the response looks exactly the same.
 
 Response and next action:
-The fake reference looks trusted (no highlight), and the "sources found" make it look even safer. The student would probably copy it into the essay. The system never asks which part of "AI in school" the student means.
+The made-up paper has no highlight, so it looks safe, and the student would probably copy it into the essay. The system never asks which part of "AI in school" the student means, and it does not say when the search fails.
+
+**Result: problem found.** A fake paper gets through, because "same answer every time" does not mean "true".
+
+![Test B](test_screens/testB.png)
 
 ## Review and revision
 Use the tests to identify an interaction or system problem. Note the evidence, then describe one interaction change and one technology or system change. Explain why the changes help and run Test B again.
@@ -97,7 +114,7 @@ Updated diagram: `diagrams/system_path_v2.png`
 ![System path v2](diagrams/system_path_v2.png)
 
 ### Test B again (v2)
-Full output: `test_runs/v2_testB.md` and `test_runs/v2_testB_source_down.md`. Run: `python check_this_sim.py --version v2 --test B`
+Run: `python check_this_sim.py --version v2 --test B` (and with `--source-down`). Records: `test_runs/v2_testB.md`, `test_runs/v2_testB_source_down.md`. Screens: right side of `test_screens/testB.png` and `test_screens/testB_search_down.png`.
 
 | | v1 | v2 |
 |---|---|---|

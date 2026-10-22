@@ -145,108 +145,118 @@ def analyse(version, question, item, source_down=False):
 
 
 def run(version, test, source_down=False):
+    """Run one test and return a short, readable test record (Markdown)."""
     question = TESTS[test]
+    kind = "standard input" if test == "A" else "problem input (vague request for a source)"
     out = []
     p = out.append
-    title = f"{version.upper()} - Test {test}" + (" (source search down)" if source_down else "")
+    title = f"Test {test} on {version}: {kind}" + (", source search down" if source_down else "")
     p(f"# {title}\n")
-    p("## Input\n")
-    p(f"> {question}\n")
+    p(f"Screen: `test_screens/test{test}{'_search_down' if source_down else ''}.png` (v1 left, v2 right)\n")
 
-    p("## What the system receives\n")
-    p("- The student's question (text).")
-    p("- [MOCKED] One model answer and two resampled answers to the same question.")
-    p("- [MOCKED] Results from the source search for each sentence." + (" The search is DOWN in this run." if source_down else "") + "\n")
+    p("## 1. Input")
+    p(f"The student types: **\"{question}\"**\n")
 
-    p("## What it does\n")
-    steps = []
     key, item = pick_mock_answer(question)
     if item is None:
-        p("1. [MOCKED] No canned model answer for this question.\n")
-        p("## Response shown to the student\n")
-        p("> Sorry, this prototype cannot answer that question. It only has answers for the two test questions.\n")
-        p("## Next action for the student\n")
-        p("- Ask one of the test questions, or use another tool.\n")
+        p("## 2. What the system receives\n- Only the question. There is no answer for it in this prototype. [MOCKED]\n")
+        p("## 3. What it does\n- Stops.\n")
+        p("## 4. Response and next action\n> Sorry, this prototype cannot answer that question.\n\nThe student can ask one of the test questions.\n")
         return "\n".join(out)
 
     clarify, results, search_ok = analyse(version, question, item, source_down)
-    if clarify:
-        steps.append(f"[IMPLEMENTED] Request check: this asks for a source, but the topic is only {clarify}. Marked as vague.")
-    steps.append(f"[MOCKED] Model writes an answer with {len(item['answer'])} sentences and is asked the same question 2 more times.")
 
-    steps.append("[IMPLEMENTED] Consistency check: compare the numbers in each sentence with the same sentence in the 2 resamples.")
-    if source_down:
-        steps.append("[MOCKED] Source search: FAILED (service unavailable)." + (" v1 does not report this." if version == "v1" else " v2 reports it to the student."))
-    else:
-        steps.append("[MOCKED] Source search: look for sources that match each sentence.")
+    p("## 2. What the system receives")
+    p(f"- The question above.")
+    p(f"- An answer with {len(results)} sentences, plus the same question answered 2 more times. [MOCKED: mock_data.json]")
+    p("- Source search results for each sentence. [MOCKED]" + (" **In this run the search fails.**" if source_down else "") + "\n")
+
+    p("## 3. What it does")
+    n = 1
+    if version == "v2":
+        p(f"{n}. Checks the request: " + (f"it asks for a source, but the topic is only \"{' '.join(clarify)}\", so it is **too vague**." if clarify else "it is clear enough.")); n += 1
+    p(f"{n}. Checks each sentence:"); n += 1
+    for i, r in enumerate(results, 1):
+        bits = []
+        bits.append("same in all 3 answers" if r["consistent"] else "**changed** when asked again")
+        if not search_ok:
+            bits.append("search failed")
+        elif r["sources"]:
+            bits.append("related sources found: " + ", ".join(s["id"] for s in r["sources"]))
+        else:
+            bits.append("no source found")
+        if version == "v2":
+            if r["type"] == "reference":
+                bits.append({True: "paper record found", False: "**no record of this paper**", None: "paper not checked"}[r["verified"]])
+            elif r["type"] == "number/date" and r["verified"] is not None:
+                bits.append("number found in a source" if r["verified"] else "number not found in a source")
+        verdict = "**YELLOW**" if r["flag"] else "no highlight"
+        p(f"   - Sentence {i}: \"{r['text']}\" → {'; '.join(bits)} → {verdict}")
     if version == "v1":
-        steps.append("[IMPLEMENTED] Flag rule v1: highlight a sentence only if it was NOT consistent. Sources are shown but do not change the flag.")
+        p(f"{n}. Rule v1: highlight only the sentences that changed. (The sources do not change the decision.)\n")
     else:
-        steps.append("[IMPLEMENTED] Sentence type check: reference / number-date / general.")
-        steps.append("[IMPLEMENTED] Validation v2: a reference must match a real paper record by title; a number must appear in a found source.")
-        steps.append("[IMPLEMENTED] Flag rule v2: highlight if NOT consistent OR NOT verified. If the search is down, every reference/number is marked 'Not checked'.")
-    for n, s in enumerate(steps, 1):
-        p(f"{n}. {s}")
-    p("")
+        p(f"{n}. Rule v2: highlight if it changed **or** it could not be verified. If the search fails, mark facts as \"Not checked\".\n")
 
-    p("### Sentence check table\n")
-    p("| # | Sentence | Type | Same in resamples? | Sources found | Verified | Flag |")
-    p("|---|---|---|---|---|---|---|")
-    for n, r in enumerate(results, 1):
-        src = ", ".join(s["id"] for s in r["sources"]) or ("search down" if not search_ok else "none")
-        ver = {None: "-", True: "yes", False: "no"}[r["verified"]] if version == "v2" else "(not checked in v1)"
-        typ = r["type"] if version == "v2" else "(not used in v1)"
-        p(f"| {n} | {r['text']} | {typ} | {'yes' if r['consistent'] else 'no'} | {src} | {ver} | {'YELLOW' if r['flag'] else '-'} |")
-    p("")
-
-    # ---------- response ----------
-    p("## Response shown to the student\n")
+    p("## 4. Response and next action")
+    p("What the student sees (⚠ = yellow highlight):\n")
     if version == "v2" and not search_ok:
-        p("> **Notice:** I could not reach the source search right now, so I could not check any facts. "
-          "References, numbers and dates are marked **Not checked**. You can try again later or check them yourself.\n")
+        p("> **Notice:** I could not reach the source search, so references, numbers and dates are marked Not checked.")
     if clarify:
-        p("> **Your request is broad.** Which part of \"AI in school\" is your essay about?  "
-          "`[AI tutors]` `[AI and exams]` `[Teachers using AI]` `[Type my own topic]`\n")
+        p("> **Your request is broad.** Which part of \"AI in school\" is your essay about? [AI tutors] [AI and exams] [Teachers using AI] [Type my own topic]")
     for r in results:
         if r["flag"]:
-            label = "Not checked" if (version == "v2" and not search_ok) else ("NOT VERIFIED" if r["verified"] is False and r["type"] == "reference" else "Check this")
-            p(f"> =={r['text']}== `[{label}]`")
+            if version == "v2" and not search_ok:
+                lab = "Not checked"
+            elif version == "v2" and r["type"] == "reference" and r["verified"] is False:
+                lab = "NOT VERIFIED"
+            else:
+                lab = "Check this"
+            p(f"> ⚠ {r['text']} **[{lab}]**")
             if version == "v2":
-                p(f">   - Why? {'; '.join(r['reasons'])}.")
+                p(f">   Why? {'; '.join(r['reasons'])}.")
                 if r["type"] == "reference":
-                    if search_ok:
-                        p(">   - `[Find real papers]` `[Remove this reference]` `[I will check it myself]`")
-                    else:
-                        p(">   - `[Try the search again]` `[Remove this reference]` `[I will check it myself]`")
+                    p(">   [" + ("Find real papers" if search_ok else "Try the search again") + "] [Remove this reference] [I will check it myself]")
         else:
-            mark = " `[Checked: " + ", ".join(s['id'] for s in r['sources']) + "]`" if (version == "v2" and r["verified"]) else ""
+            mark = " **[Checked]**" if (version == "v2" and r["verified"]) else ""
             p(f"> {r['text']}{mark}")
     if version == "v2" and clarify and search_ok:
-        real = [s for s in DATA["source_index"] if s["type"] == "paper"]
-        p(">\n> **Real papers found in the paper search** (open them before you use them):")
-        for s in real:
-            p(f">   - {s['id']}: {s['title']}")
+        p("> Real papers found in the search: " + "; ".join(f"{s['id']} {s['title']}" for s in DATA["source_index"] if s["type"] == "paper"))
     p("")
 
-    p("## Next action for the student\n")
+    p("Next action:")
     if version == "v1":
-        flagged = [n for n, r in enumerate(results, 1) if r["flag"]]
-        p(f"- The student sees {len(flagged)} yellow sentence(s): {flagged or 'none'}. They can click \"Check this\" on those.")
-        unflagged_refs = [n for n, r in enumerate(results, 1) if not r["flag"] and sentence_type(r["text"]) == "reference"]
-        if unflagged_refs:
-            p(f"- Sentence(s) {unflagged_refs} look trusted (no highlight), so the student would probably copy them into the essay.")
+        flagged = [i for i, r in enumerate(results, 1) if r["flag"]]
+        p(f"- The student can click \"Check this\" on sentence {', '.join(map(str, flagged))}.")
+        hidden = [i for i, r in enumerate(results, 1) if not r["flag"] and r["type"] == "reference"]
+        if hidden:
+            p(f"- Sentence {', '.join(map(str, hidden))} (the paper) has no highlight, so it looks safe. The student would probably copy it.")
         if source_down:
-            p("- Nothing tells the student that the source search failed.")
+            p("- Nothing tells the student that the search failed.")
     else:
         if clarify:
-            p("- Pick a narrower topic, so the system can search again.")
-        p("- For each yellow sentence: read the reason, then check it, fix it, remove it or keep it.")
-        if search_ok and clarify:
-            p("- Open one of the real papers from the search instead of the unverified one.")
+            p("- Pick a narrower topic.")
+        p("- Read the reason on each yellow sentence, then check, fix, remove or keep it.")
+        if clarify and search_ok:
+            p("- Use a real paper from the search instead of the unverified one.")
         if not search_ok:
-            p("- Try again later, or check the 'Not checked' facts by hand.")
+            p("- Try again later, or check the \"Not checked\" facts by hand.")
     p("")
-    return "\n".join(out)
+
+    # one-line result, the same idea as the verdict in compare_view.html
+    hidden = [r for r in results if r["type"] == "reference" and not r["flag"]]
+    if hidden:
+        res = "PROBLEM: the made-up paper is not highlighted."
+    elif version == "v1" and source_down:
+        res = "PROBLEM: the search failed, but the student is not told."
+    elif version == "v2" and not search_ok:
+        res = "OK: the student is told the search failed."
+    elif version == "v2" and clarify:
+        res = "OK: the made-up paper is caught, each flag has a reason, and the system asks before guessing."
+    else:
+        res = "OK: the wrong number is highlighted."
+    p(f"**Result:** {res}\n")
+    # keep each quoted line on its own line in Markdown viewers
+    return "\n".join(l + "  " if l.startswith(">") else l for l in out)
 
 
 # ---------- visual view (HTML) ----------

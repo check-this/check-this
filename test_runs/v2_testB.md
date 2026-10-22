@@ -1,48 +1,36 @@
-# V2 - Test B
+# Test B on v2: problem input (vague request for a source)
 
-## Input
+Screen: `test_screens/testB.png` (v1 left, v2 right)
 
-> can u give me a source about AI in school for my essay
+## 1. Input
+The student types: **"can u give me a source about AI in school for my essay"**
 
-## What the system receives
+## 2. What the system receives
+- The question above.
+- An answer with 2 sentences, plus the same question answered 2 more times. [MOCKED: mock_data.json]
+- Source search results for each sentence. [MOCKED]
 
-- The student's question (text).
-- [MOCKED] One model answer and two resampled answers to the same question.
-- [MOCKED] Results from the source search for each sentence.
+## 3. What it does
+1. Checks the request: it asks for a source, but the topic is only "ai school", so it is **too vague**.
+2. Checks each sentence:
+   - Sentence 1: "Here is a useful paper: Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60." → same in all 3 answers; related sources found: R1, R2; **no record of this paper** → **YELLOW**
+   - Sentence 2: "It shows that AI tutors improved test scores by 20%." → **changed** when asked again; related sources found: R1; number not found in a source → **YELLOW**
+3. Rule v2: highlight if it changed **or** it could not be verified. If the search fails, mark facts as "Not checked".
 
-## What it does
+## 4. Response and next action
+What the student sees (⚠ = yellow highlight):
 
-1. [IMPLEMENTED] Request check: this asks for a source, but the topic is only ['ai', 'school']. Marked as vague.
-2. [MOCKED] Model writes an answer with 2 sentences and is asked the same question 2 more times.
-3. [IMPLEMENTED] Consistency check: compare the numbers in each sentence with the same sentence in the 2 resamples.
-4. [MOCKED] Source search: look for sources that match each sentence.
-5. [IMPLEMENTED] Sentence type check: reference / number-date / general.
-6. [IMPLEMENTED] Validation v2: a reference must match a real paper record by title; a number must appear in a found source.
-7. [IMPLEMENTED] Flag rule v2: highlight if NOT consistent OR NOT verified. If the search is down, every reference/number is marked 'Not checked'.
+> **Your request is broad.** Which part of "AI in school" is your essay about? [AI tutors] [AI and exams] [Teachers using AI] [Type my own topic]  
+> ⚠ Here is a useful paper: Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60. **[NOT VERIFIED]**  
+>   Why? no matching record for this paper was found in the paper search, so it may not exist.  
+>   [Find real papers] [Remove this reference] [I will check it myself]  
+> ⚠ It shows that AI tutors improved test scores by 20%. **[Check this]**  
+>   Why? the numbers changed when the model answered again (also said 35).  
+> Real papers found in the search: R1 AI tutoring systems and student learning: a review (placeholder record, 2020); R2 Generative AI in secondary classrooms (placeholder record, 2024)  
 
-### Sentence check table
+Next action:
+- Pick a narrower topic.
+- Read the reason on each yellow sentence, then check, fix, remove or keep it.
+- Use a real paper from the search instead of the unverified one.
 
-| # | Sentence | Type | Same in resamples? | Sources found | Verified | Flag |
-|---|---|---|---|---|---|---|
-| 1 | Here is a useful paper: Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60. | reference | yes | R1, R2 | no | YELLOW |
-| 2 | It shows that AI tutors improved test scores by 20%. | number/date | no | R1 | no | YELLOW |
-
-## Response shown to the student
-
-> **Your request is broad.** Which part of "AI in school" is your essay about?  `[AI tutors]` `[AI and exams]` `[Teachers using AI]` `[Type my own topic]`
-
-> ==Here is a useful paper: Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60.== `[NOT VERIFIED]`
->   - Why? no matching record for this paper was found in the paper search, so it may not exist.
->   - `[Find real papers]` `[Remove this reference]` `[I will check it myself]`
-> ==It shows that AI tutors improved test scores by 20%.== `[Check this]`
->   - Why? the numbers changed when the model answered again (also said 35).
->
-> **Real papers found in the paper search** (open them before you use them):
->   - R1: AI tutoring systems and student learning: a review (placeholder record, 2020)
->   - R2: Generative AI in secondary classrooms (placeholder record, 2024)
-
-## Next action for the student
-
-- Pick a narrower topic, so the system can search again.
-- For each yellow sentence: read the reason, then check it, fix it, remove it or keep it.
-- Open one of the real papers from the search instead of the unverified one.
+**Result:** OK: the made-up paper is caught, each flag has a reason, and the system asks before guessing.

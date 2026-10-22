@@ -41,3 +41,9 @@ Tool used: Claude (Anthropic) in the Claude app, as above.
 Request or command: I ran `python3 check_this_sim.py --version v1 --test B` and `--version v2 --test B` in my own terminal. The output was correct, but I said the test output was hard to read.
 What came back: Claude added a `--html` option to `check_this_sim.py`. It writes `compare_view.html`, which shows v1 and v2 side by side as chat screens for Test A, Test B and Test B with the search down, with a one-line verdict under each. The Markdown test outputs in `test_runs/` stayed the same.
 What I decided to keep, change or reject, and why: **(to complete)**
+
+## 2026-10-22 23:57  Redo the test part
+Tool used: Claude (Anthropic) in the Claude app, as above.
+Request or command: I asked Claude to redo only the test part, because the test output was still hard to read. I kept the use case and the diagrams.
+What came back: The same two test inputs, but each test record in `test_runs/` now follows the four fields (input, what it receives, what it does, response and next action) in plain steps, with a one-line result. Claude also added screenshots of each test screen in `test_screens/` (v1 left, v2 right) and rewrote the Test A and Test B parts of `01_SPEC.md` to use them. The checks and the results did not change.
+What I decided to keep, change or reject, and why: **(to complete)**

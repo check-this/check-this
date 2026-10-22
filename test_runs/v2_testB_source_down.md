@@ -1,46 +1,36 @@
-# V2 - Test B (source search down)
+# Test B on v2: problem input (vague request for a source), source search down
 
-## Input
+Screen: `test_screens/testB_search_down.png` (v1 left, v2 right)
 
-> can u give me a source about AI in school for my essay
+## 1. Input
+The student types: **"can u give me a source about AI in school for my essay"**
 
-## What the system receives
+## 2. What the system receives
+- The question above.
+- An answer with 2 sentences, plus the same question answered 2 more times. [MOCKED: mock_data.json]
+- Source search results for each sentence. [MOCKED] **In this run the search fails.**
 
-- The student's question (text).
-- [MOCKED] One model answer and two resampled answers to the same question.
-- [MOCKED] Results from the source search for each sentence. The search is DOWN in this run.
+## 3. What it does
+1. Checks the request: it asks for a source, but the topic is only "ai school", so it is **too vague**.
+2. Checks each sentence:
+   - Sentence 1: "Here is a useful paper: Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60." → same in all 3 answers; search failed; paper not checked → **YELLOW**
+   - Sentence 2: "It shows that AI tutors improved test scores by 20%." → **changed** when asked again; search failed → **YELLOW**
+3. Rule v2: highlight if it changed **or** it could not be verified. If the search fails, mark facts as "Not checked".
 
-## What it does
+## 4. Response and next action
+What the student sees (⚠ = yellow highlight):
 
-1. [IMPLEMENTED] Request check: this asks for a source, but the topic is only ['ai', 'school']. Marked as vague.
-2. [MOCKED] Model writes an answer with 2 sentences and is asked the same question 2 more times.
-3. [IMPLEMENTED] Consistency check: compare the numbers in each sentence with the same sentence in the 2 resamples.
-4. [MOCKED] Source search: FAILED (service unavailable). v2 reports it to the student.
-5. [IMPLEMENTED] Sentence type check: reference / number-date / general.
-6. [IMPLEMENTED] Validation v2: a reference must match a real paper record by title; a number must appear in a found source.
-7. [IMPLEMENTED] Flag rule v2: highlight if NOT consistent OR NOT verified. If the search is down, every reference/number is marked 'Not checked'.
+> **Notice:** I could not reach the source search, so references, numbers and dates are marked Not checked.  
+> **Your request is broad.** Which part of "AI in school" is your essay about? [AI tutors] [AI and exams] [Teachers using AI] [Type my own topic]  
+> ⚠ Here is a useful paper: Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60. **[Not checked]**  
+>   Why? the source search was unavailable, so this fact could not be checked.  
+>   [Try the search again] [Remove this reference] [I will check it myself]  
+> ⚠ It shows that AI tutors improved test scores by 20%. **[Not checked]**  
+>   Why? the numbers changed when the model answered again (also said 35); the source search was unavailable, so this fact could not be checked.  
 
-### Sentence check table
+Next action:
+- Pick a narrower topic.
+- Read the reason on each yellow sentence, then check, fix, remove or keep it.
+- Try again later, or check the "Not checked" facts by hand.
 
-| # | Sentence | Type | Same in resamples? | Sources found | Verified | Flag |
-|---|---|---|---|---|---|---|
-| 1 | Here is a useful paper: Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60. | reference | yes | search down | - | YELLOW |
-| 2 | It shows that AI tutors improved test scores by 20%. | number/date | no | search down | - | YELLOW |
-
-## Response shown to the student
-
-> **Notice:** I could not reach the source search right now, so I could not check any facts. References, numbers and dates are marked **Not checked**. You can try again later or check them yourself.
-
-> **Your request is broad.** Which part of "AI in school" is your essay about?  `[AI tutors]` `[AI and exams]` `[Teachers using AI]` `[Type my own topic]`
-
-> ==Here is a useful paper: Smith, J. (2021). AI Tutors in Secondary Schools. Journal of Learning Technology, 12(3), 45-60.== `[Not checked]`
->   - Why? the source search was unavailable, so this fact could not be checked.
->   - `[Try the search again]` `[Remove this reference]` `[I will check it myself]`
-> ==It shows that AI tutors improved test scores by 20%.== `[Not checked]`
->   - Why? the numbers changed when the model answered again (also said 35); the source search was unavailable, so this fact could not be checked.
-
-## Next action for the student
-
-- Pick a narrower topic, so the system can search again.
-- For each yellow sentence: read the reason, then check it, fix it, remove it or keep it.
-- Try again later, or check the 'Not checked' facts by hand.
+**Result:** OK: the student is told the search failed.

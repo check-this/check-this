@@ -2,13 +2,13 @@
 
 Use this file if you ask an AI assistant to help with the project. Name the tool, record the request or command, summarise what came back and explain what you kept, changed or rejected. If you did not use an assistant, you do not need to submit this file.
 
-Note: the parts marked **(to complete)** must be written by me after I review the work. They record my own decisions, so the assistant did not fill them in.
+Note: the "What I decided" parts were drafted by Claude from what I said in the chat. I checked them before adding them.
 
 ## 2026-10-20 17:15  Plan the lab
 Tool used: Claude (Anthropic) in the Claude app. It could read and write files in my Downloads folder and run Python and Git in its own workspace.
 Request or command: I pasted the Lab 3 instructions and the submission rules. Earlier in the same chat, Claude had helped with my Lab 1 and Lab 2 work, so it had my problem sentence and my Week 2 storyboard ("Check this" highlights in a study chatbot).
 What came back: A summary of the four phases and a plan: use one use case from the Week 2 storyboard (mark unreliable sentences), build a small Python simulation with a mocked model and a mocked source search, run Test A (fact question) and Test B (vague request for a source), draw a system path diagram, keep a Git history and zip the whole folder. It also said this log would name Claude as the tool.
-What I decided to keep, change or reject, and why: **(to complete)**
+What I decided to keep, change or reject, and why: I kept the plan: one use case from my Week 2 storyboard, a Python simulation with mocked data, and Tests A and B. I chose to continue with Claude and to name it in this log.
 
 ## 2026-10-20 17:21  Build the simulation and run the tests
 Tool used: Claude (Anthropic) in the Claude app, as above.
@@ -24,7 +24,7 @@ What came back:
 - `test_runs/*.md`: the outputs for v1 and v2.
 - Results: in Test B the v1 path did **not** flag the fake reference, because the model repeated it every time. The v2 path flagged it as NOT VERIFIED and asked a clarifying question.
 
-What I decided to keep, change or reject, and why: **(to complete)**
+What I decided to keep, change or reject, and why: I kept the simulation. I ran Test B on v1 and v2 in my own terminal and checked that the output was the same as the records. I asked Claude to explain what the code does, so I can explain it myself.
 
 ## 2026-10-20 17:30  Diagrams and specification
 Tool used: Claude (Anthropic) in the Claude app, as above.
@@ -34,22 +34,22 @@ What came back:
 - `01_SPEC.md` filled in: use case, inputs, processing and technology table, fallback, Test A, Test B, review table (6 questions with evidence), one interaction change, one technology change, Test B again and why it helps.
 - Copies of my Week 2 storyboard images in `storyboard/`.
 
-What I decided to keep, change or reject, and why: **(to complete)**
+What I decided to keep, change or reject, and why: I kept the use case, the diagrams and the spec, but later I cut them down (see the last entry).
 
 ## 2026-10-20 17:51  Make the test results easier to see
 Tool used: Claude (Anthropic) in the Claude app, as above.
 Request or command: I ran `python3 check_this_sim.py --version v1 --test B` and `--version v2 --test B` in my own terminal. The output was correct, but I said the test output was hard to read.
 What came back: Claude added a `--html` option to `check_this_sim.py`. It writes `compare_view.html`, which shows v1 and v2 side by side as chat screens for Test A, Test B and Test B with the search down, with a one-line verdict under each. The Markdown test outputs in `test_runs/` stayed the same.
-What I decided to keep, change or reject, and why: **(to complete)**
+What I decided to keep, change or reject, and why: I asked for this because the text output was hard to read. Later I rejected it, because the lab does not ask for it.
 
 ## 2026-10-22 23:57  Redo the test part
 Tool used: Claude (Anthropic) in the Claude app, as above.
 Request or command: I asked Claude to redo only the test part, because the test output was still hard to read. I kept the use case and the diagrams.
 What came back: The same two test inputs, but each test record in `test_runs/` now follows the four fields (input, what it receives, what it does, response and next action) in plain steps, with a one-line result. Claude also added screenshots of each test screen in `test_screens/` (v1 left, v2 right) and rewrote the Test A and Test B parts of `01_SPEC.md` to use them. The checks and the results did not change.
-What I decided to keep, change or reject, and why: **(to complete)**
+What I decided to keep, change or reject, and why: I chose to redo only the test part and keep the use case and diagrams. I kept the clearer four-part test records, but later removed the screenshots because the lab does not need them.
 
 ## 2026-10-23 00:22  Cut the work back to what the lab asks for
 Tool used: Claude (Anthropic) in the Claude app, as above.
 Request or command: I asked what the lab actually requires and asked Claude not to do more than that.
 What came back: Claude removed the extra parts: the HTML comparison page, the screenshots, the "search down" test, the v2 rerun of Test A, the second storyboard image, the clarifying question and the search-down fallback. Now there is one interaction change (NOT VERIFIED label with a reason and buttons) and one system change (paper validation step), Test A and Test B on v1, and Test B again on v2. `check_this_sim.py` is shorter (about 150 lines), and `01_SPEC.md` and both diagrams were updated to match.
-What I decided to keep, change or reject, and why: **(to complete)**
+What I decided to keep, change or reject, and why: I rejected the extra parts and kept only what the lab asks for: one interaction change, one system change, Tests A and B, and Test B again. This keeps the project simple, and I can explain every part.
